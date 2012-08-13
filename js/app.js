@@ -1,6 +1,80 @@
 
 $(function() {
 
+  // Tone frequencies
+  var frequencies = {};
+  var n = 16;
+  for (var o = 0; o < 5; o++) {
+    for (var k in Bandoneon.keys) {
+      frequencies[Bandoneon.keys[k] + '' + o] = 440 * Math.pow(2, (n - 49) / 12);
+      n++;
+    }
+  }
+
+  const SAMPLE_RATE = 44100;
+  const NUM_SAMPLES = 65536;
+  const NUM_CHANNELS = 2;
+
+  var audioContext = null;
+  var source = null;
+  var waveFormType = DSP.SINE;
+
+  (function initAudio() {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+    if (window.AudioContext) {
+      audioContext = new AudioContext();
+      source = audioContext.createBufferSource();
+      source.buffer = audioContext.createBuffer(NUM_CHANNELS, NUM_SAMPLES, SAMPLE_RATE);
+      source.loop = true;
+    } else { // Try setup for moz audio.
+      audioContext = new Audio();
+      if (audioContext.mozSetup) {
+        audioContext.mozSetup(NUM_CHANNELS, SAMPLE_RATE);
+      }
+    }
+  })();
+
+  var gain = 0.1;
+
+  var stopTimeout = null;
+
+  var stop = function() {
+    if (source) {
+      source.disconnect(0);
+    }
+  };
+
+  var playNote = function(key) {
+    if (! frequencies.hasOwnProperty(key)) return;
+
+    var freq = frequencies[key];
+
+    clearTimeout(stopTimeout);
+    stop();
+    var osc = new Oscillator(waveFormType, freq, gain, NUM_SAMPLES, SAMPLE_RATE);
+    osc.generate();
+
+    if (source) {
+      source.buffer.getChannelData(0).set(osc.signal);
+      source.buffer.getChannelData(1).set(osc.signal);
+    } else {
+      audioContext.mozWriteAudio(osc.signal);
+    }
+
+    if (source) {
+      source.noteOn(0);
+      source.connect(audioContext.destination);
+    }
+    stopTimeout = setTimeout(stop, 500);
+  };
+
+
+
+
+
+
+
   // Color codes for coloring the scale lines
   var scaleColors = ['blue', 'red', 'green', 'orange', 'blue'];
 
@@ -126,11 +200,18 @@ $(function() {
 
         var fill = (this.showOctaveColors ? octaveColors[octave % (octaveColors.length)] : 'white');
 
-        this.paper.circle(layout[k][0] + 30, layout[k][1] + 30, 30)
+        var circle = this.paper.circle(layout[k][0] + 30, layout[k][1] + 30, 30)
           .attr({
             'stroke-width': 2,
             'fill': fill
           });
+
+        circle.node.onclick = function() {
+          var this_label = label;
+          return function() {
+            playNote(this_label);
+          }
+        }();
 
         this.paper.text(layout[k][0] + 30, layout[k][1] + 30, l)
           .attr({
