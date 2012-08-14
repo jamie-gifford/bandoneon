@@ -35,7 +35,7 @@ $(function() {
     }
   })();
 
-  var gain = 0.1;
+  var gain = 0.2;
 
   var stopTimeout = null;
 
@@ -68,11 +68,6 @@ $(function() {
     }
     stopTimeout = setTimeout(stop, 500);
   };
-
-
-
-
-
 
 
   // Color codes for coloring the scale lines
@@ -181,7 +176,7 @@ $(function() {
 
     // Render button layout (with colored octaves)
     renderButtons: function(side, direction) {
-      var layout = _.clone(Bandoneon.layout[side][direction]);
+      var layout = Bandoneon.layout[side][direction];
 
       for (var k in layout) {
         var label = k;
@@ -190,13 +185,13 @@ $(function() {
         if (label[1] == '#') {
           octave = label[2];
         }
-        if (octave === 0) l = label[0].toUpperCase();
+        if (octave == 0) l = label[0].toUpperCase();
         if (label[1] == '#') l += '♯';
         else if (label[1] == 'b') l += '♭';
-        if (octave === 1) l += '';
-        else if (octave === 2) l += 'ʹ';
-        else if (octave === 3) l += 'ʹʹ';
-        else if (octave === 4) l += 'ʹʹʹ';
+        if (octave == 1) l += '';
+        else if (octave == 2) l += 'ʹ';
+        else if (octave == 3) l += 'ʹʹ';
+        else if (octave == 4) l += 'ʹʹʹ';
 
         var fill = (this.showOctaveColors ? octaveColors[octave % (octaveColors.length)] : 'white');
 
@@ -206,12 +201,28 @@ $(function() {
             'fill': fill
           });
 
-        circle.node.onclick = function() {
+        circle.click(function() {
           var this_label = label;
+          var this_circle = circle;
           return function() {
             playNote(this_label);
           }
-        }();
+        }());
+
+        circle.mouseover(function() {
+          var this_circle = circle;
+          return function() {
+            this_circle.attr({fill: '#ffa'});
+          }
+        }());
+
+        circle.mouseout(function() {
+          var this_circle = circle;
+          var this_fill = fill;
+          return function() {
+            this_circle.attr({fill: this_fill})
+          }
+        }());
 
         this.paper.text(layout[k][0] + 30, layout[k][1] + 30, l)
           .attr({
@@ -225,7 +236,7 @@ $(function() {
 
     // Render a specific scale
     renderScale: function(side, direction, scale, color) {
-      var layout = _.clone(Bandoneon.layout[side][direction]);
+      var layout = Bandoneon.layout[side][direction];
       if (!layout) return;
 
       var pathString = '';
