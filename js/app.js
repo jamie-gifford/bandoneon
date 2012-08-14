@@ -35,7 +35,7 @@ $(function() {
     }
   })();
 
-  var gain = 0.2;
+  var gain = 0.3;
 
   var stopTimeout = null;
 
@@ -201,7 +201,7 @@ $(function() {
             'fill': fill
           });
 
-        circle.click(function() {
+        circle.mousedown(function() {
           var this_label = label;
           var this_circle = circle;
           return function() {
