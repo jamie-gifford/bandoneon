@@ -1,12 +1,7 @@
-(function() {
-  window.Bandoneon = {};
-})();
-
-
 // Keyboard layout
 // ---------------
 
-Bandoneon.layout = {
+module.exports = {
 
   'right': {
 
@@ -172,85 +167,6 @@ Bandoneon.layout = {
       'f0': [706, 303]
     }
 
-  }
-
-};
-
-
-// Chords
-// ------
-
-Bandoneon.chords = {
-
-  'major': {
-    
-    'c': ['c1', 'e2', 'g1'],
-    'd': ['d1', 'a1', 'f#1'],
-    'e': ['e0', 'g#1', 'b1'],
-    'f': ['f0', 'a1', 'c2'],
-    'g': ['g0', 'b1', 'd2'],
-    'a': ['a0', 'e2', 'c#2'],
-    'b': ['b0', 'd#2', 'f#1'],
-
-    'c#': ['c#1', 'f1', 'g#1'], // c# e#, g#
-    'd#': ['d#1', 'g1', 'a#1'], // d#, f##, a#
-    'f#': ['f#0', 'a#1', 'c#2'],
-    'a#': ['a#0', 'd2', 'f1'], // #a, c## e#
-    'g#': ['g#0', 'c2', 'd#2'], // g#, h#, d#
-
-  }
-
-  // ...
-
-};
-
-
-// Key names
-// ---------
-
-Bandoneon.keys = [ 
-  
-  'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'
-
-];
-
-
-// Available modes
-// ---------------
-
-Bandoneon.modes = {
-
-  'major': [ 2, 2, 1, 2, 2, 2, 1 ],
-  'minor': [ 2, 1, 2, 2, 1, 2, 2 ],
-  'chromatic': [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
-
-};
-
-
-// Helper functions
-// ----------------
-
-Bandoneon.utils = {
-
-  // Build a scale of a key, octave and mode, e.g. ('d', 3, 'major')
-  scale: function(key, octave, mode) {
-    var pos = Bandoneon.keys.indexOf(key);
-    if (pos === -1) return [];
-
-    var intervals = Bandoneon.modes[mode];
-    if (typeof intervals === 'undefined') return [];
-
-    var scale = [];
-    for (var s in intervals) {
-      scale.push(Bandoneon.keys[pos] + '' + octave);
-      pos += intervals[s];
-      if (pos >= Bandoneon.keys.length) {
-        octave++;
-      }
-      pos %= Bandoneon.keys.length;
-    }
-
-    return scale;
   }
 
 };
